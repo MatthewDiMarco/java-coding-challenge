@@ -1,7 +1,6 @@
 package com.javacodingchallenge;
 
 import com.javacodingchallenge.model.Name;
-import com.javacodingchallenge.model.Postcode;
 import com.javacodingchallenge.service.NameService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;

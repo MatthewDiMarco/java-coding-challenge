@@ -1,5 +1,7 @@
 package com.javacodingchallenge.controller;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.javacodingchallenge.View;
 import com.javacodingchallenge.exception.ApiRequestException;
 import com.javacodingchallenge.model.Name;
 import com.javacodingchallenge.model.NameSearchResult;
@@ -24,12 +26,29 @@ public class NameController {
     }
 
     @GetMapping
+    @JsonView(View.GeneralView.class)
     public ResponseEntity<?> getAllNames() {
         List<Name> names = nameService.getAllNames();
         return new ResponseEntity<>(names, HttpStatus.OK);
     }
 
+    @GetMapping(path = "{nameId}")
+    @JsonView({View.NameDetailView.class})
+    public ResponseEntity<?> getNameById(@PathVariable(name = "nameId") Long nameId) throws ApiRequestException {
+        Name name;
+        try {
+            name = nameService.getNameById(nameId);
+        } catch (IllegalArgumentException e) {
+            throw new ApiRequestException(e.getMessage());
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(name);
+    }
+
     @GetMapping(path = "{lowerPostcode}/{upperPostcode}")
+    @JsonView(View.GeneralView.class)
     public ResponseEntity<?> getNamesInRange(
             @PathVariable(name = "lowerPostcode") String lowerPostcode,
             @PathVariable(name = "upperPostcode") String upperPostcode) throws ApiRequestException {
@@ -47,6 +66,7 @@ public class NameController {
     }
 
     @PostMapping
+    @JsonView(View.GeneralView.class)
     public ResponseEntity<?> addNames(@RequestBody List<Name> newNames) throws ApiRequestException {
         try {
             nameService.saveNames(newNames);
