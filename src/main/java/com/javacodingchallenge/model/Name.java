@@ -1,5 +1,8 @@
 package com.javacodingchallenge.model;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.javacodingchallenge.View;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
@@ -10,13 +13,16 @@ public class Name {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView(View.GeneralView.class)
     private Long nameId;
 
     @Column(name = "name")
+    @JsonView(View.GeneralView.class)
     @NotEmpty
     private String name;
 
     @Column(name = "postcode")
+    @JsonView(View.NameDetailView.class)
     @Pattern(regexp = "[0-9]{4}") // 4 digit string
     private String postcode;
 
