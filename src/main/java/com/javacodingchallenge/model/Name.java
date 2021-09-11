@@ -1,6 +1,8 @@
 package com.javacodingchallenge.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 
 @Entity
 @Table(name = "Name")
@@ -11,17 +13,19 @@ public class Name {
     private Long nameId;
 
     @Column(name = "name")
+    @NotEmpty
     private String name;
 
     @Column(name = "postcode")
-    private Postcode postcode;
+    @Pattern(regexp = "[0-9]{4}") // 4 digit string
+    private String postcode;
 
     public Name() {
         this.name = "none";
-        this.postcode = new Postcode("0000");
+        this.postcode = "0000";
     }
 
-    public Name(String name, Postcode postcode) {
+    public Name(String name, String postcode) {
         this.name = name;
         this.postcode = postcode;
     }
@@ -34,15 +38,15 @@ public class Name {
         return name;
     }
 
-    public Postcode getPostcode() {
+    public String getPostcode() {
         return postcode;
     }
 
-    public boolean inPostcodeRange(Postcode lowerPostcode, Postcode upperPostcode) {
+    public boolean inPostcodeRange(String lowerPostcode, String upperPostcode) {
         // get codes as integers (e.g. "0000" -> 0)
-        int lower = Integer.parseInt(lowerPostcode.getCode());
-        int upper = Integer.parseInt(upperPostcode.getCode());
-        int thisCode = Integer.parseInt(postcode.getCode());
+        int lower = Integer.parseInt(lowerPostcode);
+        int upper = Integer.parseInt(upperPostcode);
+        int thisCode = Integer.parseInt(postcode);
 
         // validate range
         if (lower > upper) {

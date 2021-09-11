@@ -1,10 +1,12 @@
 package com.javacodingchallenge.model;
 
 import javax.persistence.Embeddable;
+import javax.validation.constraints.Pattern;
 
 @Embeddable
 public class Postcode {
 
+    @Pattern(regexp = "[0-9]{4}")
     private String code;
 
     public Postcode() {

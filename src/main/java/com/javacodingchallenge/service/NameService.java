@@ -1,12 +1,12 @@
 package com.javacodingchallenge.service;
 
-import com.javacodingchallenge.exception.ApiRequestException;
 import com.javacodingchallenge.model.Name;
 import com.javacodingchallenge.model.NameSearchResult;
 import com.javacodingchallenge.model.Postcode;
+import com.javacodingchallenge.repository.NameRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -15,25 +15,23 @@ import java.util.stream.Collectors;
 @Service
 public class NameService {
 
-    // todo: repository
+    @Autowired
+    private final NameRepository nameRepository;
 
-    public NameService() {
-        // todo
+    public NameService(NameRepository nameRepository) {
+        this.nameRepository = nameRepository;
     }
 
-    public NameSearchResult getNamesInRange(String lowerPostcodeStr, String upperPostcodeStr) {
-        // todo: get this from repo...
-        List<Name> testList = new ArrayList<>();
-        testList.add(new Name("Lesmurdie", new Postcode("6076")));
-        testList.add(new Name("Kalamunda", new Postcode("6076")));
-        testList.add(new Name("Bentley", new Postcode("6102")));
+    public List<Name> getAllNames() {
+        return (List<Name>) nameRepository.findAll();
+    }
 
-        // validate imported postcodes
-        Postcode lowerPostcode = new Postcode(lowerPostcodeStr);
-        Postcode upperPostcode = new Postcode(upperPostcodeStr);
+    public NameSearchResult getNamesInRange(String lowerPostcode, String upperPostcode) {
+        // fetch all names
+        List<Name> allNames = (List<Name>) nameRepository.findAll();
 
         // process names
-        List<Name> processedNames = testList.stream()
+        List<Name> processedNames = allNames.stream()
                 .filter(name -> name.inPostcodeRange(lowerPostcode, upperPostcode))
                 .sorted(Comparator.comparing(Name::getName))
                 .collect(Collectors.toList());
@@ -43,6 +41,10 @@ public class NameService {
         processedNames.forEach(name -> charCounter.addAndGet(name.getName().length()));
 
         return new NameSearchResult(charCounter.get(), processedNames);
+    }
+
+    public void saveNames(List<Name> names) {
+        nameRepository.saveAll(names);
     }
 
 }

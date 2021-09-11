@@ -1,15 +1,16 @@
 package com.javacodingchallenge.controller;
 
 import com.javacodingchallenge.exception.ApiRequestException;
+import com.javacodingchallenge.model.Name;
 import com.javacodingchallenge.model.NameSearchResult;
 import com.javacodingchallenge.service.NameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.ConstraintViolationException;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/names")
@@ -22,22 +23,40 @@ public class NameController {
         this.nameService = nameService;
     }
 
+    @GetMapping
+    public ResponseEntity<?> getAllNames() {
+        List<Name> names = nameService.getAllNames();
+        return new ResponseEntity<>(names, HttpStatus.OK);
+    }
+
     @GetMapping(path = "{lowerPostcode}/{upperPostcode}")
     public ResponseEntity<?> getNamesInRange(
-            @PathVariable(name = "lowerPostcode") String lowerPostcodeStr,
-            @PathVariable(name = "upperPostcode") String upperPostcodeStr) throws ApiRequestException {
+            @PathVariable(name = "lowerPostcode") String lowerPostcode,
+            @PathVariable(name = "upperPostcode") String upperPostcode) throws ApiRequestException {
         NameSearchResult result;
         try {
             result = nameService.getNamesInRange(
-                    lowerPostcodeStr, upperPostcodeStr);
-
-        } catch(IllegalStateException | IllegalArgumentException e) {
+                    lowerPostcode, upperPostcode);
+        } catch(ConstraintViolationException | IllegalArgumentException e) {
             throw new ApiRequestException(e.getMessage());
         }
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(result);
+    }
+
+    @PostMapping
+    public ResponseEntity<?> addNames(@RequestBody List<Name> newNames) throws ApiRequestException {
+        try {
+            nameService.saveNames(newNames);
+        } catch(ConstraintViolationException | IllegalArgumentException e) {
+            throw new ApiRequestException(e.getMessage());
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(newNames);
     }
 
 }
