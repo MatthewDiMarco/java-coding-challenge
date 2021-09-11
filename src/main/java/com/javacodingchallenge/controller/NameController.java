@@ -1,6 +1,7 @@
 package com.javacodingchallenge.controller;
 
 import com.javacodingchallenge.model.Name;
+import com.javacodingchallenge.model.NameSearchResult;
 import com.javacodingchallenge.service.NameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,12 +30,12 @@ public class NameController {
             @PathVariable(name = "lowerPostcode") String lowerPostcodeStr,
             @PathVariable(name = "upperPostcode") String upperPostcodeStr
     ) {
-        List<Name> names = nameService.getNamesInRange(
+        NameSearchResult result = nameService.getNamesInRange(
                 lowerPostcodeStr, upperPostcodeStr);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(names);
+                .body(result);
     }
 
 }
