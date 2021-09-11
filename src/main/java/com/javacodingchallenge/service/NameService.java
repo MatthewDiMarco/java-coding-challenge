@@ -52,8 +52,9 @@ public class NameService {
         return new NameSearchResult(charCounter.get(), processedNames);
     }
 
-    public void saveNames(List<Name> names) {
-        nameRepository.saveAll(names);
+    public List<Name> saveNames(List<Name> names) {
+        List<Name> savedNames = (List<Name>) nameRepository.saveAll(names);
+        return savedNames;
     }
 
 }

@@ -56,7 +56,7 @@ public class NameController {
         try {
             result = nameService.getNamesInRange(
                     lowerPostcode, upperPostcode);
-        } catch(ConstraintViolationException | IllegalArgumentException e) {
+        } catch(IllegalArgumentException e) {
             throw new ApiRequestException(e.getMessage());
         }
 
@@ -70,7 +70,7 @@ public class NameController {
     public ResponseEntity<?> addNames(@RequestBody List<Name> newNames) throws ApiRequestException {
         try {
             nameService.saveNames(newNames);
-        } catch(ConstraintViolationException | IllegalArgumentException e) {
+        } catch(ConstraintViolationException e) {
             throw new ApiRequestException(e.getMessage());
         }
 
