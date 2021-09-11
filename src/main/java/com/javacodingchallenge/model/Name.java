@@ -44,9 +44,16 @@ public class Name {
         int upper = Integer.parseInt(upperPostcode.getCode());
         int thisCode = Integer.parseInt(postcode.getCode());
 
+        // validate range
+        if (lower > upper) {
+            throw new IllegalArgumentException(
+                    "Lower bound (" + lower + ") " +
+                    "is greater than upper (" + upper + ")");
+        }
+
         // check range
         boolean valid = false;
-        if (thisCode > lower && thisCode < upper) {
+        if (thisCode >= lower && thisCode <= upper) {
             valid = true;
         }
 

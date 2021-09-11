@@ -1,5 +1,6 @@
 package com.javacodingchallenge.service;
 
+import com.javacodingchallenge.exception.ApiRequestException;
 import com.javacodingchallenge.model.Name;
 import com.javacodingchallenge.model.NameSearchResult;
 import com.javacodingchallenge.model.Postcode;

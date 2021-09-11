@@ -30,8 +30,4 @@ public class Postcode {
         return code;
     }
 
-    public void setCode(String postcode) {
-        this.code = postcode;
-    }
-
 }

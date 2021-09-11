@@ -1,6 +1,6 @@
 package com.javacodingchallenge.controller;
 
-import com.javacodingchallenge.model.Name;
+import com.javacodingchallenge.exception.ApiRequestException;
 import com.javacodingchallenge.model.NameSearchResult;
 import com.javacodingchallenge.service.NameService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping(path = "/names")
@@ -24,14 +22,18 @@ public class NameController {
         this.nameService = nameService;
     }
 
-    // todo: exception handling
     @GetMapping(path = "{lowerPostcode}/{upperPostcode}")
     public ResponseEntity<?> getNamesInRange(
             @PathVariable(name = "lowerPostcode") String lowerPostcodeStr,
-            @PathVariable(name = "upperPostcode") String upperPostcodeStr
-    ) {
-        NameSearchResult result = nameService.getNamesInRange(
-                lowerPostcodeStr, upperPostcodeStr);
+            @PathVariable(name = "upperPostcode") String upperPostcodeStr) throws ApiRequestException {
+        NameSearchResult result;
+        try {
+            result = nameService.getNamesInRange(
+                    lowerPostcodeStr, upperPostcodeStr);
+
+        } catch(IllegalStateException | IllegalArgumentException e) {
+            throw new ApiRequestException(e.getMessage());
+        }
 
         return ResponseEntity
                 .status(HttpStatus.OK)
