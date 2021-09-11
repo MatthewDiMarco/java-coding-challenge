@@ -71,7 +71,13 @@ public class NameController {
         try {
             nameService.saveNames(newNames);
         } catch(ConstraintViolationException e) {
-            throw new ApiRequestException(e.getMessage());
+            StringBuilder stringBuilder = new StringBuilder();
+            e.getConstraintViolations()
+                    .forEach(ex -> {
+                        stringBuilder.append(ex.getMessageTemplate());
+                    });
+
+            throw new ApiRequestException(stringBuilder.toString());
         }
 
         return ResponseEntity

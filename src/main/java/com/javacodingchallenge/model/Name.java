@@ -18,12 +18,15 @@ public class Name {
 
     @Column(name = "name")
     @JsonView(View.GeneralView.class)
-    @NotEmpty
+    @NotEmpty(message = "Name cannot be empty")
     private String name;
 
     @Column(name = "postcode")
     @JsonView(View.NameDetailView.class)
-    @Pattern(regexp = "[0-9]{4}") // 4 digit string
+    @Pattern(
+            regexp = "[0-9]{4}",
+            message = "Postcodes must be 4 characters with digits only (e.g. 6076)"
+    )
     private String postcode;
 
     public Name() {
@@ -50,9 +53,15 @@ public class Name {
 
     public boolean inPostcodeRange(String lowerPostcode, String upperPostcode) {
         // get codes as integers (e.g. "0000" -> 0)
-        int lower = Integer.parseInt(lowerPostcode);
-        int upper = Integer.parseInt(upperPostcode);
-        int thisCode = Integer.parseInt(postcode);
+        int lower, upper, thisCode;
+        try {
+            lower = Integer.parseInt(lowerPostcode);
+            upper = Integer.parseInt(upperPostcode);
+            thisCode = Integer.parseInt(postcode);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(
+                    "Failed to parse postcode, " + e.getMessage());
+        }
 
         // validate range
         if (lower > upper) {
