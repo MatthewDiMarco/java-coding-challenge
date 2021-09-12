@@ -17,9 +17,15 @@ public class JavaCodingChallengeApplication {
         SpringApplication.run(JavaCodingChallengeApplication.class, args);
     }
 
+    /**
+     * Populates the database with data for testing.
+     * @param nameService Name Servive
+     * @return args
+     */
     @Bean
     CommandLineRunner run(NameService nameService) {
         return args -> {
+            /*
             List<Name> testList = new ArrayList<>();
 
             // test data
@@ -29,6 +35,7 @@ public class JavaCodingChallengeApplication {
 
             // populate database
             nameService.saveNames(testList);
+            */
         };
     }
 

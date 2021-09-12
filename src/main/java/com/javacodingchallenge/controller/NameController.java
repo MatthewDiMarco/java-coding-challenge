@@ -7,6 +7,7 @@ import com.javacodingchallenge.model.Name;
 import com.javacodingchallenge.model.NameSearchResult;
 import com.javacodingchallenge.service.NameService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -78,6 +79,10 @@ public class NameController {
                     });
 
             throw new ApiRequestException(stringBuilder.toString());
+        } catch (DataIntegrityViolationException e) {
+            throw new ApiRequestException(
+                    "Data Integrity Violation: " +
+                    "the provided name may already exist in the database");
         }
 
         return ResponseEntity

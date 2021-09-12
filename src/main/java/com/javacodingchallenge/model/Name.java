@@ -16,7 +16,7 @@ public class Name {
     @JsonView(View.GeneralView.class)
     private Long nameId;
 
-    @Column(name = "name")
+    @Column(name = "name", unique = true)
     @JsonView(View.GeneralView.class)
     @NotEmpty(message = "Name cannot be empty")
     private String name;
