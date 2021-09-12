@@ -8,20 +8,27 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -36,11 +43,11 @@ class NameControllerTest {
 
     ObjectMapper mapper = new ObjectMapper();
 
-    @MockBean
-    NameService nameService;
-
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    NameService nameService;
 
     @BeforeEach
     void setUp() {
@@ -73,7 +80,7 @@ class NameControllerTest {
     }
 
     @Test
-    void getNameById_Exception() {
+    void getNameById_IllegalArgumentException() {
         try {
             when(nameService.getNameById(any(Long.class))).thenThrow(IllegalArgumentException.class);
             ResultActions perform = mockMvc.perform(get("/names/2"));
@@ -109,9 +116,25 @@ class NameControllerTest {
     }
 
     @Test
-    void addNames_Exception() {
+    void addNames_DataIntegrityViolationException() {
         try {
-            when(nameService.saveNames(anyList())).thenThrow(ConstraintViolationException.class);
+            when(nameService.saveNames(anyList())).thenThrow(DataIntegrityViolationException.class);
+            ResultActions perform = mockMvc.perform(post("/names")
+                    .content(mapper.writeValueAsString(names))
+                    .contentType(MediaType.APPLICATION_JSON));
+            perform.andExpect(status().isBadRequest());
+        } catch (Exception e) {
+            Assertions.fail(e.getMessage());
+        }
+    }
+
+    @Test
+    void addNames_ConstraintViolationException() {
+        try {
+            Set<ConstraintViolation<?>> mockViolations = new HashSet<>();
+            ConstraintViolationException mockedException = mock(ConstraintViolationException.class);
+            when(mockedException.getConstraintViolations()).thenReturn(mockViolations);
+            when(nameService.saveNames(anyList())).thenThrow(mockedException);
             ResultActions perform = mockMvc.perform(post("/names")
                     .content(mapper.writeValueAsString(names))
                     .contentType(MediaType.APPLICATION_JSON));
