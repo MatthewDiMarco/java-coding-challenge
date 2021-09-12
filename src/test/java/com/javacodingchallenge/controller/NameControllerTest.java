@@ -109,7 +109,7 @@ class NameControllerTest {
             ResultActions perform = mockMvc.perform(post("/names")
                     .content(mapper.writeValueAsString(names))
                     .contentType(MediaType.APPLICATION_JSON));
-            perform.andExpect(status().isOk());
+            perform.andExpect(status().isBadRequest());
         } catch (Exception e) {
             Assertions.fail(e.getMessage());
         }
